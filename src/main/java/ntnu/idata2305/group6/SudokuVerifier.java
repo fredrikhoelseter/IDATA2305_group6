@@ -1,19 +1,16 @@
 package ntnu.idata2305.group6;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
+
 public class SudokuVerifier {
 
     private static final int numberOfThreads = 3;
-    private static final int[][] sudoku = {
-            {6, 2, 4, 5, 3, 9, 1, 8, 7},
-            {5, 1, 9, 7, 2, 8, 6, 3, 4},
-            {8, 3, 7, 6, 1, 4, 2, 9, 5},
-            {1, 4, 3, 8, 6, 5, 7, 2, 9},
-            {9, 5, 8, 2, 4, 7, 3, 6, 1},
-            {7, 6, 2, 3, 9, 1, 4, 5, 8},
-            {3, 7, 1, 9, 5, 6, 8, 4, 2},
-            {4, 9, 6, 1, 8, 2, 5, 7, 3},
-            {2, 8, 5, 4, 7, 3, 9, 1, 6}
-    };
+    private static int[][] sudoku = new int[9][9];
 
     private static boolean rowsVerified;
     private static boolean columnsVerified;
@@ -26,6 +23,8 @@ public class SudokuVerifier {
         public SudokuObject(int row, int column) {
             this.row = row;
             this.column = column;
+
+
         }
     }
 
@@ -109,13 +108,28 @@ public class SudokuVerifier {
 
 
     public static void main(String[] args) {
+        String fileName = "solvedsudoku.csv";
+
         Thread[] threads = new Thread[numberOfThreads];
+
+        Thread CSVThread = new Thread(new CSVHandler(fileName));
+        CSVThread.start();
+        try {
+            CSVThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         threads[0] = new Thread(new SudokuRowsVerifier());
         threads[1] = new Thread(new SudokuColumnsVerifier());
         threads[2] = new Thread(new SudokuSquaresVerifier());
 
+
+
+
+
         for (int i = 0; i < threads.length; i++) {
-            threads[i].start();
+                threads[i].start();
         }
 
         for (int i = 0; i < threads.length; i++) {
@@ -130,6 +144,45 @@ public class SudokuVerifier {
             System.out.println("Sudoku is valid!");
         } else {
             System.out.println("Sudoku is invalid!");
+        }
+    }
+
+    public static class CSVHandler implements Runnable {
+
+        private String fileName;
+
+        public CSVHandler(String fileName) {
+            this.fileName = fileName;
+        }
+
+        @Override
+        public void run() {
+            int i;
+            int x = 0;
+            String lineOfText;
+            try (
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(this.getClass()
+                            .getResourceAsStream("/" + fileName), StandardCharsets.UTF_8))
+            ) {
+                String[] separatedText;
+                while ((lineOfText = reader.readLine()) != null) {
+                    separatedText = lineOfText.split(",");
+                    for (i = 0; i < separatedText.length; i++) {
+                        sudoku[i][x] = Integer.parseInt(separatedText[i*x]);
+                    }
+                    x++;
+                }
+
+            } catch (IOException ioException) {
+                System.err.println("asvljkg");
+
+            } catch (IllegalArgumentException iae) {
+                System.err.println("dsbjklv");
+
+            } catch (ArrayIndexOutOfBoundsException arrayIndexOutOfBoundsException) {
+                System.err.println("lzdfgjk");
+
+            }
         }
     }
 }
