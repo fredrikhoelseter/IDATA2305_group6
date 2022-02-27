@@ -167,8 +167,8 @@ public class SudokuVerifier {
                 String[] separatedText;
                 while ((lineOfText = reader.readLine()) != null) {
                     separatedText = lineOfText.split(",");
-                    for (i = 0; i < separatedText.length; i++) {
-                        sudoku[i][x] = Integer.parseInt(separatedText[i*x]);
+                    for (i = 0; i < 9; i++) {
+                        sudoku[i][x] = Integer.parseInt(separatedText[i]);
                     }
                     x++;
                 }
@@ -180,8 +180,7 @@ public class SudokuVerifier {
                 System.err.println("dsbjklv");
 
             } catch (ArrayIndexOutOfBoundsException arrayIndexOutOfBoundsException) {
-                System.err.println("lzdfgjk");
-
+                arrayIndexOutOfBoundsException.printStackTrace();
             }
         }
     }
